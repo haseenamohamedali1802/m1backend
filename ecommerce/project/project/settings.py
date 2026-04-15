@@ -228,6 +228,9 @@ else:
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise for serving static files
+# Add WhiteNoise to also serve media files
+WHITENOISE_ROOT = BASE_DIR / 'static'
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
