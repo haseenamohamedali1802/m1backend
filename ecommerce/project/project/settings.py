@@ -237,6 +237,7 @@ STORAGES = {
     },
 }
 
+# Media files root - where uploaded images are stored
 MEDIA_ROOT = BASE_DIR / 'static' / 'images'
 
 # CORS Settings
