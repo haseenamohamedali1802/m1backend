@@ -32,7 +32,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-@2llavc)!xz2_1svnl#cc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Allow all hosts in production for Render (more specific can be set via env var)
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+else:
+    ALLOWED_HOSTS = ['*']  # Render handles this at the proxy level
 
 # Render.com specific
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -212,15 +216,28 @@ EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 STATIC_URL = 'static/'
 
 MEDIA_URL='/images/'
-STATICFILES_DIRS=[
-    BASE_DIR / 'static'
-]
+
+# Only include STATICFILES_DIRS if the folder exists
+STATIC_DIR = BASE_DIR / 'static'
+if STATIC_DIR.exists():
+    STATICFILES_DIRS = [STATIC_DIR]
+else:
+    STATICFILES_DIRS = []
 
 # Production static files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MEDIA_ROOT='static/images'
+# WhiteNoise for serving static files
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+MEDIA_ROOT = BASE_DIR / 'static' / 'images'
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all in development
